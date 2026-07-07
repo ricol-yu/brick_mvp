@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ball_power"
+name = "力量"
+type = "Ball"
+rarity = "Common"
+description = "基础伤害提升"
+effect = {
+&"damageAdd": 0.3
+}
+max_level = 5
+tags = ["Damage", "Ball"]
+exclusive_tags = []
+unlock_condition = ""

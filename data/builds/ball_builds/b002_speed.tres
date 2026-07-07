@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ball_speed"
+name = "极速"
+type = "Ball"
+rarity = "Common"
+description = "飞行速度提升"
+effect = {
+&"speedAdd": 40.0
+}
+max_level = 5
+tags = ["Speed", "Ball"]
+exclusive_tags = []
+unlock_condition = ""

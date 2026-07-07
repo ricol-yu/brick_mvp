@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ball_split"
+name = "分裂"
+type = "Ball"
+rarity = "Rare"
+description = "球每次反弹后额外生成一颗球"
+effect = {
+&"splitCountAdd": 1
+}
+max_level = 3
+tags = ["Split", "Ball"]
+exclusive_tags = []
+unlock_condition = ""

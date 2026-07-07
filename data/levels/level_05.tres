@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/level_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = 5
+level_name = "最终关 - 终极试炼"
+rows = [
+{"type": "hard", "count": 15},
+{"type": "hard", "count": 15},
+{"type": "normal", "count": 15},
+{"type": "hard", "count": 15},
+{"type": "hard", "count": 15},
+{"type": "normal", "count": 15},
+{"type": "hard", "count": 10}
+]
+has_boss = true
+boss_id = "boss_final"
+push_speed_multiplier = 2.5
+row_spawn_multiplier = 0.6
+coin_reward = 50

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/level_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = 1
+level_name = "第一关 - 入门"
+rows = [
+{"type": "normal", "count": 15},
+{"type": "normal", "count": 15},
+{"type": "normal", "count": 15}
+]
+has_boss = false
+boss_id = ""
+push_speed_multiplier = 1.0
+row_spawn_multiplier = 1.0
+coin_reward = 5

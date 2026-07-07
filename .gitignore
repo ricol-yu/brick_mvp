@@ -1,0 +1,33 @@
+# Godot 4.x 项目 .gitignore
+
+# Godot 编辑器缓存（必须忽略）
+.godot/
+
+# 导出构建产物
+export/
+build/
+*.exe
+*.dmg
+*.AppImage
+*.zip
+*.wasm
+*.pck
+
+# 导出配置（含路径等本地信息，不应提交）
+export_presets.cfg
+
+# IDE 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.bak
+
+# 日志文件
+*.log

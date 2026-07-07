@@ -1,0 +1,376 @@
+## 游戏世界场景脚本
+## 管理墙壁、砖块容器、底线、砖块生成器、关卡推进、砖块下压、Boss 生成
+extends Node2D
+
+## 场景预加载
+const BALL_SCENE := preload("res://scenes/entities/ball/ball.tscn")
+const PADDLE_SCENE := preload("res://scenes/entities/paddle/paddle.tscn")
+const HUD_SCENE := preload("res://scenes/ui/hud.tscn")
+const BUILD_SELECT_SCENE := preload("res://scenes/ui/build_select.tscn")
+const BOSS_SCENE := preload("res://scenes/entities/boss/boss.tscn")
+const BONUS_BRICK_SCENE := preload("res://scenes/entities/bricks/bonus_brick.tscn")
+
+## 砖块场景映射
+const BRICK_SCENES: Dictionary = {
+	"normal": "res://scenes/entities/bricks/brick_normal.tscn",
+	"hard": "res://scenes/entities/bricks/brick_hard.tscn",
+}
+
+## 子节点引用
+@onready var ball_container: Node2D = $BallContainer
+@onready var brick_container: Node2D = $BrickContainer
+@onready var paddle: CharacterBody2D = $Paddle
+@onready var ball: CharacterBody2D = $Ball
+@onready var bottom_line: StaticBody2D = $BottomLine
+
+## HUD 和 BuildSelectUI（运行时实例化）
+var hud: CanvasLayer = null
+var build_select_ui: CanvasLayer = null
+
+## 关卡管理
+var current_level_index: int = 0
+var level_data_list: Array[Resource] = []
+var current_level_data: Resource = null
+
+## 当前关卡行生成进度（波次系统）
+var current_row_index: int = 0
+
+## 砖块下压系统
+var push_speed: float = BalanceData.BRICK_PUSH_SPEED_INITIAL
+var push_timer: float = 0.0
+var row_spawn_timer: float = 0.0
+var row_spawn_interval: float = BalanceData.BRICK_ROW_SPAWN_INTERVAL
+var push_speed_increment_timer: float = 0.0
+
+## 当前球数量
+var ball_count: int = 1
+
+## 当前 Boss 引用
+var current_boss: CharacterBody2D = null
+
+## Bonus Brick 生成计时器
+var bonus_brick_timer: float = 0.0
+var bonus_brick_interval: float = 0.0
+
+## Safety Build 减速效果
+var push_speed_slow_timer: float = 0.0
+var push_speed_slow_duration: float = 5.0  ## 减速持续 5 秒
+var push_speed_reduction: float = 0.0
+
+## 底线 Y 坐标
+const BOTTOM_LINE_Y_POS: float = 650.0
+
+func _ready() -> void:
+	EventBus.ball_hit_bottom.connect(_on_ball_hit_bottom)
+	EventBus.brick_destroyed.connect(_on_brick_destroyed)
+	EventBus.boss_defeated.connect(_on_boss_defeated)
+	EventBus.game_started.connect(_on_game_started)
+	
+	# 确保挡板在屏幕底部
+	paddle.position = Vector2(BalanceData.WORLD_WIDTH * 0.5, BOTTOM_LINE_Y_POS - 30.0)
+	
+	# 确保球在挡板上方
+	ball.position = Vector2(paddle.position.x, paddle.position.y - 30.0)
+	
+	# 实例化 HUD
+	hud = HUD_SCENE.instantiate()
+	add_child(hud)
+	
+	# 实例化 BuildSelectUI
+	build_select_ui = BUILD_SELECT_SCENE.instantiate()
+	add_child(build_select_ui)
+	
+	# 初始化 Bonus Brick 计时器
+	_reset_bonus_brick_timer()
+	
+	# 加载关卡数据
+	_load_level_data()
+	
+	# 生成初始砖块
+	_spawn_level_bricks()
+	
+	# 检查是否需要生成 Boss
+	_try_spawn_boss()
+	
+	# 通知 HUD 当前关卡
+	_notify_stage_changed()
+
+func _process(delta: float) -> void:
+	# 暂停切换
+	if Input.is_action_just_pressed("pause"):
+		GameManager.toggle_pause()
+	
+	if GameManager.current_state != GameManager.GameState.PLAYING:
+		return
+	
+	# 砖块下压
+	_update_brick_push(delta)
+	
+	# 新行生成计时
+	_update_row_spawn(delta)
+	
+	# 下压速度递增（每 30 秒）
+	_update_push_speed_increment(delta)
+	
+	# Bonus Brick 生成
+	_update_bonus_brick_spawn(delta)
+	
+	# Safety Build 减速效果计时
+	if push_speed_slow_timer > 0:
+		push_speed_slow_timer -= delta
+		if push_speed_slow_timer <= 0:
+			push_speed_reduction = 0.0
+
+## 加载所有关卡数据文件
+func _load_level_data() -> void:
+	level_data_list.clear()
+	var dir := DirAccess.open("res://data/levels/")
+	if dir == null:
+		push_warning("无法打开关卡目录，使用默认关卡")
+		_create_default_level()
+		return
+	
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	var level_files: Array[String] = []
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			level_files.append("res://data/levels/" + file_name)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	
+	# 按文件名排序确保关卡顺序
+	level_files.sort()
+	for path in level_files:
+		var level_res := load(path)
+		if level_res:
+			level_data_list.append(level_res)
+	
+	if level_data_list.is_empty():
+		_create_default_level()
+	
+	# 设置第一关
+	current_level_index = 0
+	if current_level_index < level_data_list.size():
+		current_level_data = level_data_list[current_level_index]
+
+## 创建默认关卡（兜底）
+func _create_default_level() -> void:
+	var default_level := LevelData.new()
+	default_level.id = 1
+	default_level.level_name = "默认关卡"
+	default_level.rows = [
+		{"type": "normal", "count": 15},
+		{"type": "normal", "count": 15},
+		{"type": "normal", "count": 15},
+	]
+	level_data_list.append(default_level)
+	current_level_data = default_level
+
+## 根据关卡数据初始化关卡（重置行生成进度，立即生成第一行）
+func _spawn_level_bricks() -> void:
+	if current_level_data == null:
+		return
+	
+	# 重置行生成进度
+	current_row_index = 0
+	
+	# 应用关卡下压倍率
+	if current_level_data is LevelData:
+		var ld := current_level_data as LevelData
+		push_speed = BalanceData.BRICK_PUSH_SPEED_INITIAL * ld.push_speed_multiplier
+	else:
+		push_speed = BalanceData.BRICK_PUSH_SPEED_INITIAL
+	
+	# 固定 5 秒一波
+	row_spawn_interval = 5.0
+	
+	# 重置计时器
+	push_timer = 0.0
+	row_spawn_timer = 0.0
+	push_speed_increment_timer = 0.0
+	
+	# 立即生成第一行
+	_spawn_new_row()
+
+## 尝试生成 Boss
+func _try_spawn_boss() -> void:
+	if current_level_data == null or not (current_level_data is LevelData):
+		return
+	var ld := current_level_data as LevelData
+	if not ld.has_boss or ld.boss_id == "":
+		return
+	
+	# 加载 Boss 数据
+	var boss_data_path := "res://data/bosses/%s.tres" % ld.boss_id
+	if not ResourceLoader.exists(boss_data_path):
+		push_warning("Boss 数据不存在: " + boss_data_path)
+		return
+	
+	var boss_data := load(boss_data_path) as BossData
+	if boss_data == null:
+		return
+	
+	# 生成 Boss
+	var boss: CharacterBody2D = BOSS_SCENE.instantiate()
+	boss.boss_data = boss_data
+	boss.global_position = Vector2(BalanceData.WORLD_WIDTH * 0.5, 180.0)
+	add_child(boss)
+	current_boss = boss
+	EventBus.boss_spawned.emit(boss)
+
+## 应用 Safety Build 减速效果
+func _apply_safety_build_slow() -> void:
+	if ball and is_instance_valid(ball):
+		var ball_script = ball as CharacterBody2D
+		if ball_script.has_method("get") or ball_script.get("damage_calc"):
+			var dc = ball_script.get("damage_calc")
+			if dc and dc.get("push_speed_reduction") and dc.push_speed_reduction > 0:
+				push_speed_reduction = dc.push_speed_reduction
+				push_speed_slow_timer = push_speed_slow_duration
+
+## 砖块下压更新
+func _update_brick_push(delta: float) -> void:
+	var effective_speed := push_speed * (1.0 - push_speed_reduction)
+	for brick in brick_container.get_children():
+		if brick is Node2D:
+			brick.position.y += effective_speed * delta
+	
+	# 检查是否有砖块到达底线
+	for brick in brick_container.get_children():
+		if brick is Node2D and brick.position.y >= BOTTOM_LINE_Y_POS:
+			GameManager.end_game(false)
+			return
+
+## 新行生成计时
+func _update_row_spawn(delta: float) -> void:
+	row_spawn_timer += delta
+	if row_spawn_timer >= row_spawn_interval:
+		row_spawn_timer = 0.0
+		_spawn_new_row()
+
+## 在顶部生成新的一行砖块（按关卡配置的 rows 逐行生成）
+func _spawn_new_row() -> void:
+	var rows: Array = []
+	if current_level_data is LevelData:
+		rows = (current_level_data as LevelData).rows
+	
+	# 当前关卡的行已全部生成完毕，自动切换到下一关
+	if current_row_index >= rows.size():
+		current_level_index += 1
+		if current_level_index >= level_data_list.size():
+			GameManager.end_game(true)
+			return
+		current_level_data = level_data_list[current_level_index]
+		current_row_index = 0
+		rows = (current_level_data as LevelData).rows
+		# 更新下压速度
+		var ld := current_level_data as LevelData
+		push_speed = BalanceData.BRICK_PUSH_SPEED_INITIAL * ld.push_speed_multiplier
+		# 通知 HUD 关卡变化
+		_notify_stage_changed()
+		# 尝试生成 Boss
+		_try_spawn_boss()
+	
+	var row_config: Dictionary = rows[current_row_index]
+	var brick_type: String = row_config.get("type", "normal")
+	var col_count: int = row_config.get("count", 15)
+	var scene_path: String = BRICK_SCENES.get(brick_type, BRICK_SCENES["normal"])
+	var brick_scene := load(scene_path)
+	
+	var brick_w := 64.0
+	var start_x := (BalanceData.WORLD_WIDTH - col_count * brick_w) * 0.5 + brick_w * 0.5
+	var start_y := 40.0
+	
+	for col in range(col_count):
+		var brick: Node2D = brick_scene.instantiate()
+		brick.position = Vector2(start_x + col * brick_w, start_y)
+		# 应用 HP 覆盖（如果有）
+		if row_config.has("hp_override"):
+			brick.hp = row_config["hp_override"]
+			brick.max_hp = row_config["hp_override"]
+		brick_container.add_child(brick)
+	
+	current_row_index += 1
+
+## 下压速度递增（每 30 秒增加）
+func _update_push_speed_increment(delta: float) -> void:
+	push_speed_increment_timer += delta
+	if push_speed_increment_timer >= 30.0:
+		push_speed_increment_timer = 0.0
+		push_speed += BalanceData.BRICK_PUSH_SPEED_INCREMENT
+
+## 球碰到底线（安全兜底：防止突发 bug 导致球卡住）
+## 保底线是物理实体，正常情况下球会被物理引擎自然反弹
+## 此回调仅作为安全网，不扣球数、不触发 Game Over
+func _on_ball_hit_bottom() -> void:
+	# 仅做安全检查，不做任何惩罚
+	pass
+
+## 重新生成球（球掉落后）
+func _respawn_ball() -> void:
+	if ball and is_instance_valid(ball):
+		ball.is_launched = false
+		ball.direction = Vector2(0, -1)
+		ball.global_position = Vector2(paddle.global_position.x, paddle.global_position.y - 30.0)
+		GameManager.change_state(GameManager.GameState.PREPARING)
+
+## 砖块被击碎（仅用于统计，关卡推进由时间驱动）
+func _on_brick_destroyed(_brick: Node, _exp: int) -> void:
+	pass
+
+## Boss 被击败
+func _on_boss_defeated(_boss: Node) -> void:
+	current_boss = null
+
+## 推进到下一关（通关时调用）
+func _advance_to_next_level() -> void:
+	current_level_index += 1
+	if current_level_index >= level_data_list.size():
+		GameManager.end_game(true)
+		return
+	
+	current_level_data = level_data_list[current_level_index]
+	current_row_index = 0
+	_notify_stage_changed()
+	_try_spawn_boss()
+
+## 通知 HUD 关卡变化
+func _notify_stage_changed() -> void:
+	var stage_name := ""
+	if current_level_data is LevelData:
+		stage_name = (current_level_data as LevelData).level_name
+	else:
+		stage_name = "关卡 %d" % (current_level_index + 1)
+	EventBus.stage_changed.emit(current_level_index + 1, stage_name)
+
+## 重置 Bonus Brick 生成计时器
+func _reset_bonus_brick_timer() -> void:
+	bonus_brick_interval = randf_range(
+		BalanceData.BONUS_BRICK_SPAWN_INTERVAL_MIN,
+		BalanceData.BONUS_BRICK_SPAWN_INTERVAL_MAX
+	)
+	bonus_brick_timer = 0.0
+
+## Bonus Brick 生成计时
+func _update_bonus_brick_spawn(delta: float) -> void:
+	bonus_brick_timer += delta
+	if bonus_brick_timer >= bonus_brick_interval:
+		bonus_brick_timer = 0.0
+		bonus_brick_interval = randf_range(
+			BalanceData.BONUS_BRICK_SPAWN_INTERVAL_MIN,
+			BalanceData.BONUS_BRICK_SPAWN_INTERVAL_MAX
+		)
+		_spawn_bonus_brick()
+
+## 生成 Bonus Brick
+func _spawn_bonus_brick() -> void:
+	var bonus_brick: StaticBody2D = BONUS_BRICK_SCENE.instantiate()
+	var rand_x := randf_range(100.0, BalanceData.WORLD_WIDTH - 100.0)
+	var rand_y := randf_range(100.0, 400.0)
+	bonus_brick.position = Vector2(rand_x, rand_y)
+	add_child(bonus_brick)
+
+## 游戏开始回调
+func _on_game_started() -> void:
+	pass

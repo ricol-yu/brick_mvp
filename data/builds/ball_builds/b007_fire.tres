@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "ball_fire"
+name = "火焰"
+type = "Ball"
+rarity = "Epic"
+description = "附带燃烧伤害，持续对砖块造成伤害"
+effect = {
+&"damageAdd": 0.5,
+&"fireDamage": 0.3,
+&"fireDuration": 3.0
+}
+max_level = 3
+tags = ["Fire", "Ball"]
+exclusive_tags = []
+unlock_condition = ""

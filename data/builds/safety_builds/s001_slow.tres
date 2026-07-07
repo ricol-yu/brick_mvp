@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "safety_slow"
+name = "减速"
+type = "Safety"
+rarity = "Common"
+description = "球掉到底线后短暂减速砖块下压速度"
+effect = {"pushSpeedReduction": 0.3}
+max_level = 3
+tags = ["Control", "Safety"]
+exclusive_tags = []
+unlock_condition = ""

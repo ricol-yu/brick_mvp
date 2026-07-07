@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BossData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/boss_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "boss_final"
+boss_name = "终极毁灭者"
+max_hp = 200.0
+move_speed = 100.0
+move_pattern = "horizontal"
+body_size = Vector2(160, 80)
+coin_reward = 50
+exp_reward = 30
+attack_interval = 8.0
+body_color = Color(0.6, 0.1, 0.8, 1)

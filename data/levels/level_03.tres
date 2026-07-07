@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LevelData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/level_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = 3
+level_name = "第三关 - 密集阵型"
+rows = [
+{"type": "normal", "count": 15},
+{"type": "normal", "count": 15},
+{"type": "hard", "count": 15},
+{"type": "normal", "count": 15},
+{"type": "hard", "count": 15}
+]
+has_boss = false
+boss_id = ""
+push_speed_multiplier = 1.5
+row_spawn_multiplier = 0.8
+coin_reward = 15

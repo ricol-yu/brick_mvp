@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/build_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = "paddle_accel"
+name = "加速"
+type = "Paddle"
+rarity = "Rare"
+description = "Perfect 反弹后球速度额外×1.25"
+effect = {
+&"reflectBonusAdd": 0.25
+}
+max_level = 3
+tags = ["Speed", "Paddle"]
+exclusive_tags = []
+unlock_condition = ""
