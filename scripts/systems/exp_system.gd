@@ -58,8 +58,10 @@ func _check_level_up() -> void:
 ## 请求 Build 选择（升级时触发）
 func _request_build_selection() -> void:
 	GameManager.change_state(GameManager.GameState.BUILD_SELECT)
-	var builds := BuildSystem.generate_build_options(3)
-	EventBus.show_build_selection.emit(builds)
+	BuildSystem.ensure_builds_loaded()
+	BuildSystem.generate_and_store_build_options(3)
+	# 直接 emit 信号给 BuildSelectUI 显示弹窗
+	EventBus.show_build_selection.emit(BuildSystem.pending_build_options)
 
 ## 重置（新一局开始时）
 func reset() -> void:

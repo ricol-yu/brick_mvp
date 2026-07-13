@@ -32,6 +32,9 @@ var run_stats: Dictionary = {
 ## 单局计时器
 var run_timer: float = 0.0
 
+## 球是否已发射（用于判断 Build 选择后应返回 PREPARING 还是 PLAYING）
+var ball_launched: bool = false
+
 func _ready() -> void:
 	EventBus.game_started.connect(_on_game_started)
 	EventBus.brick_destroyed.connect(_on_brick_destroyed)
@@ -54,6 +57,9 @@ func change_state(new_state: GameState) -> void:
 			EventBus.game_paused.emit(true)
 		GameState.BUILD_SELECT:
 			get_tree().paused = true
+		GameState.PREPARING:
+			if old_state == GameState.BUILD_SELECT:
+				get_tree().paused = false
 		GameState.PLAYING:
 			if old_state == GameState.PAUSED or old_state == GameState.BUILD_SELECT:
 				get_tree().paused = false
@@ -64,11 +70,13 @@ func change_state(new_state: GameState) -> void:
 func start_new_run() -> void:
 	_reset_run_stats()
 	run_timer = 0.0
+	ball_launched = false
 	change_state(GameState.PREPARING)
 
 ## 发射球（从准备阶段进入游戏中）
 func launch_ball() -> void:
 	if current_state == GameState.PREPARING:
+		ball_launched = true
 		change_state(GameState.PLAYING)
 		EventBus.ball_launched.emit()
 

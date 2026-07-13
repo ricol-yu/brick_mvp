@@ -94,6 +94,9 @@ func _ready() -> void:
 	
 	# 通知 HUD 当前关卡
 	_notify_stage_changed()
+	
+	# 检查是否有因初始 EXP 导致的待选 Build（MetaProgression 升级触发）
+	_check_pending_build_selection()
 
 func _process(delta: float) -> void:
 	# 暂停切换
@@ -121,30 +124,25 @@ func _process(delta: float) -> void:
 		if push_speed_slow_timer <= 0:
 			push_speed_reduction = 0.0
 
+## 关卡数据显式路径列表（避免 DirAccess 在 Web 导出时的兼容性问题）
+const LEVEL_PATHS: Array[String] = [
+	"res://data/levels/level_01.tres",
+	"res://data/levels/level_02.tres",
+	"res://data/levels/level_03.tres",
+	"res://data/levels/level_04.tres",
+	"res://data/levels/level_05.tres",
+]
+
 ## 加载所有关卡数据文件
 func _load_level_data() -> void:
 	level_data_list.clear()
-	var dir := DirAccess.open("res://data/levels/")
-	if dir == null:
-		push_warning("无法打开关卡目录，使用默认关卡")
-		_create_default_level()
-		return
-	
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	var level_files: Array[String] = []
-	while file_name != "":
-		if file_name.ends_with(".tres"):
-			level_files.append("res://data/levels/" + file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-	
-	# 按文件名排序确保关卡顺序
-	level_files.sort()
-	for path in level_files:
-		var level_res := load(path)
-		if level_res:
-			level_data_list.append(level_res)
+	for path in LEVEL_PATHS:
+		if ResourceLoader.exists(path):
+			var level_res := load(path)
+			if level_res:
+				level_data_list.append(level_res)
+		else:
+			push_warning("[GameWorld] 关卡文件不存在: " + path)
 	
 	if level_data_list.is_empty():
 		_create_default_level()
@@ -374,3 +372,12 @@ func _spawn_bonus_brick() -> void:
 ## 游戏开始回调
 func _on_game_started() -> void:
 	pass
+
+## 检查并显示待选的 Build 选择界面
+func _check_pending_build_selection() -> void:
+	var builds := BuildSystem.consume_pending_options()
+	if builds.is_empty():
+		return
+	# 确保状态正确
+	if GameManager.current_state == GameManager.GameState.BUILD_SELECT:
+		EventBus.show_build_selection.emit(builds)

@@ -9,27 +9,33 @@ var all_builds: Array[BuildData] = []
 ## 稀有度权重
 var rarity_weights: Dictionary = BalanceData.RARITY_WEIGHTS.duplicate()
 
+## 所有 Build 的显式路径列表（避免 DirAccess 在 Web 导出时的兼容性问题）
+const BUILD_PATHS: Array[String] = [
+	"res://data/builds/ball_builds/b001_power.tres",
+	"res://data/builds/ball_builds/b002_speed.tres",
+	"res://data/builds/ball_builds/b003_size.tres",
+	"res://data/builds/ball_builds/b004_split.tres",
+	"res://data/builds/ball_builds/b005_pierce.tres",
+	"res://data/builds/ball_builds/b006_crit.tres",
+	"res://data/builds/ball_builds/b007_fire.tres",
+	"res://data/builds/paddle_builds/p001_zone_expand.tres",
+	"res://data/builds/paddle_builds/p002_accel.tres",
+	"res://data/builds/paddle_builds/p003_crit.tres",
+	"res://data/builds/paddle_builds/p004_copy.tres",
+	"res://data/builds/safety_builds/s001_slow.tres",
+]
+
 ## 加载所有 Build 数据
 func load_builds() -> void:
 	all_builds.clear()
-	var build_dirs := [
-		"res://data/builds/ball_builds/",
-		"res://data/builds/paddle_builds/",
-		"res://data/builds/safety_builds/",
-	]
-	for dir_path in build_dirs:
-		var dir := DirAccess.open(dir_path)
-		if dir == null:
-			continue
-		dir.list_dir_begin()
-		var file_name := dir.get_next()
-		while file_name != "":
-			if file_name.ends_with(".tres"):
-				var build := load(dir_path + file_name) as BuildData
-				if build:
-					all_builds.append(build)
-			file_name = dir.get_next()
-		dir.list_dir_end()
+	for path in BUILD_PATHS:
+		if ResourceLoader.exists(path):
+			var build := load(path) as BuildData
+			if build:
+				all_builds.append(build)
+		else:
+			push_warning("[BuildPool] Build 文件不存在: " + path)
+	print("[BuildPool] 已加载 Build 数量: ", all_builds.size())
 
 ## 从 Build 池中抽选指定数量的 Build
 ## 规则：满级排除、互斥过滤、已有流派加成

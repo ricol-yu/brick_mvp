@@ -29,13 +29,13 @@ SaveManager="*res://scripts/core/save_manager.gd"
 ExpSystem="*res://scripts/systems/exp_system.gd"
 BuildSystem="*res://scripts/systems/build_system.gd"
 MetaProgression="*res://scripts/systems/meta_progression.gd"
+FontInit="*res://scripts/core/font_init.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [input]
 

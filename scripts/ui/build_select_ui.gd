@@ -12,6 +12,14 @@ func _ready() -> void:
 	panel.visible = false
 	# 游戏树暂停时（BUILD_SELECT 状态），UI 仍需响应输入
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# 给面板添加可见背景（深色半透明遮罩 + 面板底色）
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.1, 0.1, 0.15, 0.95)
+	panel_style.set_border_width_all(2)
+	panel_style.border_color = Color(0.4, 0.4, 0.5)
+	panel_style.set_corner_radius_all(12)
+	panel_style.set_content_margin_all(20)
+	panel.add_theme_stylebox_override("panel", panel_style)
 
 ## 显示 Build 选择界面
 func _on_show_build_selection(builds: Array) -> void:

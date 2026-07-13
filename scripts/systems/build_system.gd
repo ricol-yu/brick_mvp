@@ -11,6 +11,9 @@ var tag_system: TagSystem = TagSystem.new()
 ## 当前局已选择的 Build 列表
 var selected_builds: Array[BuildData] = []
 
+## 待显示的 Build 选项（GameWorld 就绪后取走）
+var pending_build_options: Array = []
+
 func _ready() -> void:
 	EventBus.game_started.connect(_on_game_started)
 	EventBus.build_selected.connect(_on_build_selected)
@@ -29,7 +32,11 @@ func apply_build(build_data: BuildData) -> void:
 	EventBus.build_applied.emit(build_data)
 	
 	GameManager.run_stats["builds_selected"] += 1
-	GameManager.change_state(GameManager.GameState.PLAYING)
+	# 如果球已发射过，返回 PLAYING；否则返回 PREPARING（等待玩家发射球）
+	if GameManager.ball_launched:
+		GameManager.change_state(GameManager.GameState.PLAYING)
+	else:
+		GameManager.change_state(GameManager.GameState.PREPARING)
 
 ## 获取当前已选择的所有 Build
 func get_selected_builds() -> Array[BuildData]:
@@ -44,10 +51,27 @@ func reset() -> void:
 	selected_builds.clear()
 	tag_system.reset()
 	build_pool.reset_all_build_levels()
+	# 注意：不在 reset 中清空 pending_build_options，由 consume_pending_options 消费
+
+## 确保 build pool 已加载（幂等操作）
+func ensure_builds_loaded() -> void:
+	if build_pool.all_builds.is_empty():
+		build_pool.load_builds()
+
+## 生成并存储 Build 选项（供 GameWorld 取走显示）
+func generate_and_store_build_options(count: int) -> void:
+	ensure_builds_loaded()
+	pending_build_options = generate_build_options(count)
+
+## 消费待选 Build 选项（取出并清空）
+func consume_pending_options() -> Array:
+	var options := pending_build_options
+	pending_build_options = []
+	return options
 
 func _on_game_started() -> void:
 	reset()
-	build_pool.load_builds()
+	ensure_builds_loaded()
 
 func _on_build_selected(build_data: Resource) -> void:
 	if build_data is BuildData:
