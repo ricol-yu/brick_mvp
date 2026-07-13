@@ -15,14 +15,18 @@ func _ready() -> void:
 	quit_button.pressed.connect(_on_quit_pressed)
 	EventBus.coins_changed.connect(_on_coins_changed)
 	_update_coins_display()
+	AudioManager.play_menu_bgm()
 
 func _on_start_pressed() -> void:
+	AudioManager.play_sfx("button_click")
 	SceneManager.goto_game_world()
 
 func _on_shop_pressed() -> void:
+	AudioManager.play_sfx("button_click")
 	SceneManager.goto_meta_shop()
 
 func _on_quit_pressed() -> void:
+	AudioManager.play_sfx("button_click")
 	get_tree().quit()
 
 func _on_coins_changed(_amount: int) -> void:

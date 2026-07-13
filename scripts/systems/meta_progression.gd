@@ -40,6 +40,15 @@ const UPGRADES: Dictionary = {
 		"effect_key": "coinBonus",
 		"effect_value_per_level": 0.1,
 	},
+	"meta_start_balls": {
+		"name": "多球出击",
+		"description": "每局初始球数量 +1",
+		"max_level": 3,
+		"base_cost": 25,
+		"cost_scale": 2.0,
+		"effect_key": "startBalls",
+		"effect_value_per_level": 1,
+	},
 }
 
 func _ready() -> void:
@@ -85,6 +94,12 @@ func _on_game_started() -> void:
 	var start_exp := int(get_effect_value("meta_start_exp"))
 	if start_exp > 0:
 		ExpSystem.add_exp(start_exp)
+	
+	# 应用初始球数量加成
+	var extra_balls := int(get_effect_value("meta_start_balls"))
+	if extra_balls > 0:
+		# 通知 GameWorld 生成额外的球
+		EventBus.meta_start_balls_changed.emit(extra_balls)
 
 ## 获取金币奖励加成倍率
 func get_coin_bonus_multiplier() -> float:

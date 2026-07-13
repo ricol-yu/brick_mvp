@@ -59,6 +59,8 @@ signal run_settled(coins_earned: int)
 signal meta_upgrade_purchased(upgrade_id: String)
 ## 金币数量变化
 signal coins_changed(new_amount: int)
+## 初始球数量加成（额外球数）
+signal meta_start_balls_changed(extra_balls: int)
 
 # ===================== UI 信号 =====================
 ## 请求显示伤害数字（位置, 伤害值, 是否暴击）

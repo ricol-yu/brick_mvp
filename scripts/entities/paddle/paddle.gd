@@ -18,17 +18,7 @@ var paddle_height: float = 16.0
 func _ready() -> void:
 	add_to_group("paddle")
 	_update_collision_shape()
-	_create_placeholder_texture()
 	EventBus.build_applied.connect(_on_build_applied)
-
-## 创建占位符纹理（白色矩形）
-func _create_placeholder_texture() -> void:
-	if sprite and sprite.texture == null:
-		var w := int(paddle_width)
-		var h := int(paddle_height)
-		var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-		img.fill(Color.WHITE)
-		sprite.texture = ImageTexture.create_from_image(img)
 
 func _physics_process(delta: float) -> void:
 	if GameManager.current_state not in [GameManager.GameState.PREPARING, GameManager.GameState.PLAYING]:

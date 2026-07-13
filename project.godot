@@ -29,6 +29,7 @@ SaveManager="*res://scripts/core/save_manager.gd"
 ExpSystem="*res://scripts/systems/exp_system.gd"
 BuildSystem="*res://scripts/systems/build_system.gd"
 MetaProgression="*res://scripts/systems/meta_progression.gd"
+AudioManager="*res://scripts/core/audio_manager.gd"
 FontInit="*res://scripts/core/font_init.gd"
 
 [display]
@@ -36,6 +37,11 @@ FontInit="*res://scripts/core/font_init.gd"
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+theme/default_font="res://assets/fonts/SourceHanSansSC-Regular.otf"
 
 [input]
 
@@ -80,3 +86,4 @@ pause={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

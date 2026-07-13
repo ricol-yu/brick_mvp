@@ -65,6 +65,7 @@ func _ready() -> void:
 	EventBus.brick_destroyed.connect(_on_brick_destroyed)
 	EventBus.boss_defeated.connect(_on_boss_defeated)
 	EventBus.game_started.connect(_on_game_started)
+	EventBus.meta_start_balls_changed.connect(_on_meta_start_balls_changed)
 	
 	# 确保挡板在屏幕底部
 	paddle.position = Vector2(BalanceData.WORLD_WIDTH * 0.5, BOTTOM_LINE_Y_POS - 30.0)
@@ -94,6 +95,9 @@ func _ready() -> void:
 	
 	# 通知 HUD 当前关卡
 	_notify_stage_changed()
+	
+	# 播放游戏 BGM
+	AudioManager.play_game_bgm()
 	
 	# 检查是否有因初始 EXP 导致的待选 Build（MetaProgression 升级触发）
 	_check_pending_build_selection()
@@ -371,7 +375,41 @@ func _spawn_bonus_brick() -> void:
 
 ## 游戏开始回调
 func _on_game_started() -> void:
-	pass
+	# 重置球计数
+	ball_count = 1
+
+## 初始球数量加成（来自局外升级）
+func _on_meta_start_balls_changed(extra_balls: int) -> void:
+	for i in range(extra_balls):
+		_spawn_extra_ball(i, extra_balls)
+	ball_count += extra_balls
+
+## 生成额外的球（局外升级触发）
+func _spawn_extra_ball(index: int, total: int) -> CharacterBody2D:
+	var new_ball: CharacterBody2D = BALL_SCENE.instantiate()
+	# 位置在挡板上方，横向均匀分布
+	var spacing := BalanceData.WORLD_WIDTH / (total + 1)
+	var x_pos := spacing * (index + 1)
+	new_ball.global_position = Vector2(x_pos, paddle.global_position.y - 30.0)
+	new_ball.is_split_ball = false
+	# 复制主球的伤害属性
+	if ball and is_instance_valid(ball):
+		new_ball.damage_calc.damage = ball.damage_calc.damage
+		new_ball.damage_calc.speed = ball.damage_calc.speed
+		new_ball.damage_calc.size = ball.damage_calc.size
+		new_ball.damage_calc.crit_chance = ball.damage_calc.crit_chance
+		new_ball.damage_calc.crit_multiplier = ball.damage_calc.crit_multiplier
+		new_ball.damage_calc.pierce = ball.damage_calc.pierce
+		new_ball.damage_calc.reflect_bonus = ball.damage_calc.reflect_bonus
+		new_ball.damage_calc.split_count = ball.damage_calc.split_count
+		new_ball.damage_calc.fire_damage = ball.damage_calc.fire_damage
+		new_ball.damage_calc.fire_duration = ball.damage_calc.fire_duration
+	ball_container.add_child(new_ball)
+	# 自动发射，方向稍微偏移
+	var angle := deg_to_rad(randf_range(-15.0, 15.0))
+	new_ball.direction = Vector2(sin(angle), -cos(angle)).normalized()
+	new_ball.is_launched = true
+	return new_ball
 
 ## 检查并显示待选的 Build 选择界面
 func _check_pending_build_selection() -> void:

@@ -109,6 +109,7 @@ func _create_card_ui(build_data: BuildData) -> Control:
 
 ## 玩家选择了某个 Build
 func _on_card_selected(build_data: BuildData) -> void:
+	AudioManager.play_sfx("button_click")
 	EventBus.build_selected.emit(build_data)
 	panel.visible = false
 

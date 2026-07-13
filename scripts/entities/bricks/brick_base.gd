@@ -39,20 +39,10 @@ var burn_tick_timer: float = 0.0
 func _ready() -> void:
 	add_to_group("bricks")
 	max_hp = hp
-	_create_placeholder_texture()
 	# 保存场景设置的原始颜色
 	if sprite:
 		_base_color = sprite.modulate
 	_update_visual()
-
-## 创建占位符纹理（白色矩形）
-func _create_placeholder_texture() -> void:
-	if sprite and sprite.texture == null:
-		var w := int(brick_width)
-		var h := int(brick_height)
-		var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-		img.fill(Color.WHITE)
-		sprite.texture = ImageTexture.create_from_image(img)
 
 func _process(delta: float) -> void:
 	if flash_timer > 0:
@@ -95,6 +85,7 @@ func take_damage(damage: float) -> void:
 
 ## 砖块被击碎
 func _on_destroyed() -> void:
+	AudioManager.play_sfx("brick_destroy")
 	EventBus.brick_destroyed.emit(self, reward_exp)
 	# 生成经验掉落（通过 ExpSystem 处理）
 	queue_free()
@@ -114,12 +105,9 @@ func _stop_flash() -> void:
 
 ## 更新视觉（根据 HP 比例变色）
 func _update_visual() -> void:
+	# 隐藏 HP 标签（不再显示数字）
 	if hp_label:
-		if hp > 1.0:
-			hp_label.text = str(ceili(hp))
-			hp_label.visible = true
-		else:
-			hp_label.visible = false
+		hp_label.visible = false
 	
 	# 根据 HP 比例调整颜色深度
 	if sprite and max_hp > 0:

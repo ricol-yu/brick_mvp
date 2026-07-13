@@ -26,22 +26,8 @@ var is_split_ball: bool = false
 
 func _ready() -> void:
 	_update_collision_shape()
-	_create_placeholder_texture()
 	EventBus.ball_launched.connect(_on_ball_launched)
 	EventBus.build_applied.connect(_on_build_applied)
-
-## 创建占位符纹理（白色圆形）
-func _create_placeholder_texture() -> void:
-	if sprite and sprite.texture == null:
-		var r := int(ball_radius)
-		var size := r * 2 + 2  # 略大于直径，确保圆形完整
-		var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
-		var center := Vector2(size * 0.5, size * 0.5)
-		for x in range(size):
-			for y in range(size):
-				if Vector2(x, y).distance_to(center) <= r:
-					img.set_pixel(x, y, Color.WHITE)
-		sprite.texture = ImageTexture.create_from_image(img)
 
 func _physics_process(delta: float) -> void:
 	if not is_launched:
@@ -90,10 +76,12 @@ func _handle_collision(collision: KinematicCollision2D) -> void:
 		reflect_multiplier = _handle_paddle_collision(collider, normal)
 		# 保底线碰撞：只反弹，不触发分裂
 		if collider.is_in_group("bottom_line"):
+			AudioManager.play_sfx("ball_bounce")
 			EventBus.ball_hit_bottom.emit()
 			EventBus.ball_bounced.emit("bottom_line", global_position)
 			return
 		# 球分裂：碰撞真实挡板时触发
+		AudioManager.play_sfx("ball_paddle")
 		_try_split_balls()
 		# 挡板反弹方向已由 _handle_paddle_collision 设置，直接返回
 		EventBus.ball_bounced.emit(collider_type, global_position)
@@ -111,6 +99,7 @@ func _handle_collision(collision: KinematicCollision2D) -> void:
 		remaining_pierce = damage_calc.pierce
 	elif collider.is_in_group("boss"):
 		collider_type = "boss"
+		AudioManager.play_sfx("ball_boss")
 		_handle_boss_collision(collider, reflect_multiplier)
 		# Boss 碰撞也可以使用穿透
 		if remaining_pierce > 0:
@@ -122,6 +111,7 @@ func _handle_collision(collision: KinematicCollision2D) -> void:
 		_handle_bonus_brick_collision(collider, reflect_multiplier)
 	else:
 		collider_type = "wall"
+		AudioManager.play_sfx("ball_bounce")
 	
 	# 反弹方向
 	direction = direction.bounce(normal)

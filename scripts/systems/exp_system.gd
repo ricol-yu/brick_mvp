@@ -57,6 +57,10 @@ func _check_level_up() -> void:
 
 ## 请求 Build 选择（升级时触发）
 func _request_build_selection() -> void:
+	# 先播放升级音效，等待一小段时间让音效开始播放
+	AudioManager.play_sfx("level_up")
+	await get_tree().create_timer(0.1).timeout
+	
 	GameManager.change_state(GameManager.GameState.BUILD_SELECT)
 	BuildSystem.ensure_builds_loaded()
 	BuildSystem.generate_and_store_build_options(3)

@@ -23,20 +23,6 @@ func _ready() -> void:
 	collision_layer = 64  # layer 7 (bonus_brick)
 	collision_mask = 4    # layer 3 (ball)
 	max_lifetime = randf_range(BalanceData.BONUS_BRICK_LIFETIME_MIN, BalanceData.BONUS_BRICK_LIFETIME_MAX)
-	
-	# 创建占位符纹理
-	_create_placeholder_texture()
-	
-	# 设置金色外观
-	if sprite:
-		sprite.modulate = Color(1.0, 0.85, 0.2, 1.0)
-
-## 创建占位符纹理（白色矩形）
-func _create_placeholder_texture() -> void:
-	if sprite and sprite.texture == null:
-		var img := Image.create(64, 32, false, Image.FORMAT_RGBA8)
-		img.fill(Color.WHITE)
-		sprite.texture = ImageTexture.create_from_image(img)
 
 func _process(delta: float) -> void:
 	# 闪烁

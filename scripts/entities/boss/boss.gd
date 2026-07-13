@@ -93,19 +93,26 @@ func _create_visual() -> void:
 	if not has_node("Sprite2D"):
 		var sprite := Sprite2D.new()
 		sprite.name = "Sprite2D"
-		if boss_data:
-			sprite.modulate = boss_data.body_color
-		else:
-			sprite.modulate = Color(0.8, 0.2, 0.2)
+		sprite.modulate = Color.WHITE  # 使用白色，让纹理显示原色
 		add_child(sprite)
 	
-	# 创建占位符纹理
+	# 加载 Boss 纹理（根据 boss_data.id）
 	var sprite_node := get_node_or_null("Sprite2D") as Sprite2D
 	if sprite_node and sprite_node.texture == null:
-		var body_size := boss_data.body_size if boss_data else Vector2(128, 64)
-		var img := Image.create(int(body_size.x), int(body_size.y), false, Image.FORMAT_RGBA8)
-		img.fill(Color.WHITE)
-		sprite_node.texture = ImageTexture.create_from_image(img)
+		if boss_data and boss_data.id != "":
+			var tex_path := "res://assets/sprites/boss/%s.png" % boss_data.id
+			if ResourceLoader.exists(tex_path):
+				sprite_node.texture = load(tex_path)
+			else:
+				# 回退：生成占位符纹理
+				var body_size := boss_data.body_size
+				var img := Image.create(int(body_size.x), int(body_size.y), false, Image.FORMAT_RGBA8)
+				img.fill(Color.WHITE)
+				sprite_node.texture = ImageTexture.create_from_image(img)
+		else:
+			var img := Image.create(128, 64, false, Image.FORMAT_RGBA8)
+			img.fill(Color.WHITE)
+			sprite_node.texture = ImageTexture.create_from_image(img)
 	
 	# 创建碰撞体（如果不存在）
 	if not has_node("CollisionShape2D"):
@@ -182,6 +189,7 @@ func take_damage(damage: float) -> void:
 
 ## Boss 被击败
 func _on_defeated() -> void:
+	AudioManager.play_sfx("boss_defeat")
 	EventBus.boss_defeated.emit(self)
 	# 掉落经验
 	ExpSystem.add_exp(boss_data.exp_reward)
@@ -199,5 +207,5 @@ func _start_flash() -> void:
 ## 停止闪烁
 func _stop_flash() -> void:
 	var sprite := get_node_or_null("Sprite2D") as Sprite2D
-	if sprite and boss_data:
-		sprite.modulate = boss_data.body_color
+	if sprite:
+		sprite.modulate = Color.WHITE  # 恢复为白色，让纹理显示原色
