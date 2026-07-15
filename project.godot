@@ -41,7 +41,7 @@ window/stretch/aspect="expand"
 
 [gui]
 
-theme/default_font="res://assets/fonts/SourceHanSansSC-Regular.otf"
+theme/default_font="res://assets/fonts/NotoSansSC-Regular.ttf"
 
 [input]
 

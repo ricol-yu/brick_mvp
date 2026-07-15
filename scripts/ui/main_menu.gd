@@ -9,6 +9,11 @@ extends Control
 @onready var coins_label: Label = $CoinsLabel
 
 func _ready() -> void:
+	# 确保 Control 节点继承全局字体主题（WebGL 下静态场景可能不自动继承）
+	var root_theme := get_tree().root.theme
+	if root_theme and root_theme.default_font:
+		theme = root_theme
+	
 	GameManager.change_state(GameManager.GameState.MAIN_MENU)
 	start_button.pressed.connect(_on_start_pressed)
 	shop_button.pressed.connect(_on_shop_pressed)

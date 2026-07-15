@@ -8,6 +8,11 @@ extends CanvasLayer
 ## Build 卡片使用纯代码构建（无需场景文件）
 
 func _ready() -> void:
+	# 确保 CanvasLayer 的 Control 子节点继承全局字体主题（WebGL 中 CanvasLayer 不自动继承）
+	var root_theme := get_tree().root.theme
+	if root_theme and root_theme.default_font:
+		$PanelContainer.theme = root_theme
+	
 	EventBus.show_build_selection.connect(_on_show_build_selection)
 	panel.visible = false
 	# 游戏树暂停时（BUILD_SELECT 状态），UI 仍需响应输入

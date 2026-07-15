@@ -31,3 +31,7 @@ Thumbs.db
 
 # 日志文件
 *.log
+
+# SSH keys
+id_github
+id_github.pub

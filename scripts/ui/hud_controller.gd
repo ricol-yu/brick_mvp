@@ -10,6 +10,11 @@ extends CanvasLayer
 @onready var ball_count_label: Label = $MarginContainer/VBoxContainer/TopBar/BallCountLabel
 
 func _ready() -> void:
+	# 确保 HUD 的 Control 节点继承全局字体主题（WebGL 中 CanvasLayer 不自动继承）
+	var root_theme := get_tree().root.theme
+	if root_theme and root_theme.default_font:
+		$MarginContainer.theme = root_theme
+	
 	EventBus.exp_gained.connect(_on_exp_gained)
 	EventBus.level_up.connect(_on_level_up)
 	EventBus.brick_destroyed.connect(_on_brick_destroyed)
