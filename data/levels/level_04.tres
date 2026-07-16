@@ -7,12 +7,12 @@ script = ExtResource("1_script")
 id = 4
 level_name = "第四关 - Boss 前哨"
 rows = [
-{"type": "hard", "count": 15},
-{"type": "normal", "count": 15},
-{"type": "hard", "count": 15},
-{"type": "hard", "count": 10},
-{"type": "normal", "count": 15},
-{"type": "hard", "count": 10}
+{"types": [{"type": "hard", "count": 6}, {"type": "regen", "count": 3}, {"type": "hard", "count": 3}], "slots": 15},
+{"types": [{"type": "shield", "count": 5}, {"type": "ghost", "count": 5}, {"type": "shield", "count": 2}], "slots": 15},
+{"types": [{"type": "haste", "count": 4}, {"type": "curse", "count": 4}, {"type": "haste", "count": 4}], "slots": 15},
+{"types": [{"type": "split", "count": 6}, {"type": "hard", "count": 5}], "slots": 15},
+{"type": "hard", "count": 12, "slots": 15},
+{"types": [{"type": "regen", "count": 5}, {"type": "shield", "count": 5}, {"type": "regen", "count": 2}], "slots": 15}
 ]
 has_boss = true
 boss_id = "boss_guardian"

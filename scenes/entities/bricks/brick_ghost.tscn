@@ -1,23 +1,23 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dtes0lkos1wu5"]
 
-[ext_resource type="Script" path="res://scripts/entities/bricks/brick_ghost.gd" id="1_ghost"]
-[ext_resource type="Texture2D" path="res://assets/sprites/bricks/brick_ghost.png" id="2_ghost_tex"]
+[ext_resource type="Script" uid="uid://cle6qvi8n6qfy" path="res://scripts/entities/bricks/brick_ghost.gd" id="1_ghost"]
+[ext_resource type="Texture2D" uid="uid://cyelyn4tnefca" path="res://assets/sprites/bricks/brick_ghost.png" id="2_ghost_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ghost"]
 size = Vector2(64, 32)
 
-[node name="BrickGhost" type="StaticBody2D"]
+[node name="BrickGhost" type="StaticBody2D" unique_id=1730156032]
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("1_ghost")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=491642399]
 texture = ExtResource("2_ghost_tex")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1407124768]
 shape = SubResource("RectangleShape2D_ghost")
 
-[node name="HPLabel" type="Label" parent="."]
+[node name="HPLabel" type="Label" parent="." unique_id=1480533860]
 offset_left = -10.0
 offset_top = -10.0
 offset_right = 10.0

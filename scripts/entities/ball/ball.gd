@@ -20,11 +20,18 @@ var remaining_pierce: int = 0
 ## 是否为分裂产生的子球
 var is_split_ball: bool = false
 
+## 减速诅咒状态
+var is_cursed_slow: bool = false
+var curse_slow_timer: float = 0.0
+## 移动速度倍率（仅影响移动，不影响伤害）
+var move_speed_multiplier: float = 1.0
+
 ## 子节点引用
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 func _ready() -> void:
+	add_to_group("ball")
 	_update_collision_shape()
 	EventBus.ball_launched.connect(_on_ball_launched)
 	EventBus.build_applied.connect(_on_build_applied)
@@ -38,8 +45,18 @@ func _physics_process(delta: float) -> void:
 	if GameManager.current_state != GameManager.GameState.PLAYING:
 		return
 	
-	# 移动球
-	var move_distance := damage_calc.speed * delta
+	# 减速诅咒计时
+	if is_cursed_slow:
+		curse_slow_timer -= delta
+		if curse_slow_timer <= 0:
+			is_cursed_slow = false
+			move_speed_multiplier = 1.0
+			# 恢复原始颜色
+			if sprite:
+				sprite.modulate = Color(1.0, 0.9, 0.3, 1.0)
+	
+	# 移动球（move_speed_multiplier 仅影响移动速度，不影响伤害）
+	var move_distance := damage_calc.speed * move_speed_multiplier * delta
 	var motion := direction * move_distance
 	var collision := move_and_collide(motion)
 	
@@ -259,3 +276,14 @@ func _on_build_applied(build_data: Resource) -> void:
 	if build_data is BuildData:
 		damage_calc.apply_build_effect(build_data)
 		_update_collision_shape()
+
+## 施加减速诅咒（仅降低移动速度，不影响伤害）
+func apply_curse_slow(multiplier: float, duration: float) -> void:
+	if not is_launched:
+		return
+	is_cursed_slow = true
+	move_speed_multiplier = multiplier
+	curse_slow_timer = duration
+	# 视觉反馈：球变暗紫色
+	if sprite:
+		sprite.modulate = Color(0.5, 0.2, 0.8, 1.0)

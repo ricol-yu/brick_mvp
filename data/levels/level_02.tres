@@ -7,10 +7,10 @@ script = ExtResource("1_script")
 id = 2
 level_name = "第二关 - 硬砖挑战"
 rows = [
-{"type": "normal", "count": 15},
-{"type": "hard", "count": 10},
-{"type": "normal", "count": 15},
-{"type": "hard", "count": 10}
+{"types": [{"type": "normal", "count": 8}, {"type": "hard", "count": 4}], "slots": 15},
+{"types": [{"type": "hard", "count": 6}, {"type": "shield", "count": 3}], "slots": 15},
+{"types": [{"type": "normal", "count": 8}, {"type": "hard", "count": 4}], "slots": 15},
+{"type": "hard", "count": 10, "slots": 15}
 ]
 has_boss = false
 boss_id = ""

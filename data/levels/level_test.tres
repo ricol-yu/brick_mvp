@@ -7,15 +7,10 @@ script = ExtResource("1_script")
 id = 99
 level_name = "测试关 - 新砖块"
 rows = [
-{"type": "split", "count": 10},
-{"type": "regen", "count": 8},
-{"type": "ghost", "count": 10},
-{"type": "shield", "count": 8},
-{"type": "haste", "count": 10},
 {"type": "curse", "count": 8}
 ]
 has_boss = false
 boss_id = ""
 push_speed_multiplier = 0.5
-row_spawn_multiplier = 2.0
+row_spawn_multiplier = 3.0
 coin_reward = 10

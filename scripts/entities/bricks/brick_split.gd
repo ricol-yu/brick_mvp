@@ -31,13 +31,14 @@ func _spawn_child_bricks() -> void:
 	# 左侧小砖块
 	var left_child: Node2D = child_scene.instantiate()
 	left_child.position = position + Vector2(-half_w * 0.5, 0)
+	get_parent().add_child(left_child)
+	# add_child 触发 _ready() 后会覆盖 hp，必须在之后设置
 	left_child.hp = child_hp
 	left_child.max_hp = child_hp
-	get_parent().add_child(left_child)
 	
 	# 右侧小砖块
 	var right_child: Node2D = child_scene.instantiate()
 	right_child.position = position + Vector2(half_w * 0.5, 0)
+	get_parent().add_child(right_child)
 	right_child.hp = child_hp
 	right_child.max_hp = child_hp
-	get_parent().add_child(right_child)

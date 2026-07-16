@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://df4arruu1sbsv"
-valid=false
+uid="uid://dhapotdcnenfr"
+path="res://.godot/imported/brick_shield.png-bca0d87e1b1111b4e78f1670aa377a32.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/sprites/bricks/brick_shield.png"
+dest_files=["res://.godot/imported/brick_shield.png-bca0d87e1b1111b4e78f1670aa377a32.ctex"]
 
 [params]
 

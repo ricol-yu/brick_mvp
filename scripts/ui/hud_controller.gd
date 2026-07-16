@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var score_label: Label = $MarginContainer/VBoxContainer/TopBar/ScoreLabel
 @onready var time_label: Label = $MarginContainer/VBoxContainer/TopBar/TimeLabel
 @onready var ball_count_label: Label = $MarginContainer/VBoxContainer/TopBar/BallCountLabel
+@onready var row_timer_label: Label = $MarginContainer/VBoxContainer/TopBar/RowTimerLabel
 
 func _ready() -> void:
 	# 确保 HUD 的 Control 节点继承全局字体主题（WebGL 中 CanvasLayer 不自动继承）
@@ -24,6 +25,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	_update_time_display()
 	_update_exp_bar()
+	_update_row_timer_display()
 
 ## 更新 EXP 进度条
 func _update_exp_bar() -> void:
@@ -35,6 +37,15 @@ func _update_time_display() -> void:
 	var minutes := total_seconds / 60
 	var seconds := total_seconds % 60
 	time_label.text = "%02d:%02d" % [minutes, seconds]
+
+## 更新行生成倒计时
+func _update_row_timer_display() -> void:
+	var game_world := get_parent()
+	if game_world and game_world.has_method("get"):
+		var timer: float = game_world.get("row_spawn_timer")
+		var interval: float = game_world.get("row_spawn_interval")
+		var remaining := interval - timer
+		row_timer_label.text = "下行: %.1f" % remaining
 
 ## 更新等级显示
 func _update_level_display(level: int) -> void:

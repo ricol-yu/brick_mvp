@@ -71,6 +71,7 @@ var push_speed_boost_timer: float = 0.0
 const BOTTOM_LINE_Y_POS: float = 650.0
 
 func _ready() -> void:
+	add_to_group("game_world")
 	EventBus.ball_hit_bottom.connect(_on_ball_hit_bottom)
 	EventBus.brick_destroyed.connect(_on_brick_destroyed)
 	EventBus.boss_defeated.connect(_on_boss_defeated)
@@ -140,7 +141,6 @@ func _process(delta: float) -> void:
 
 ## 关卡数据显式路径列表（避免 DirAccess 在 Web 导出时的兼容性问题）
 const LEVEL_PATHS: Array[String] = [
-	"res://data/levels/level_test.tres",
 	"res://data/levels/level_01.tres",
 	"res://data/levels/level_02.tres",
 	"res://data/levels/level_03.tres",
@@ -195,8 +195,11 @@ func _spawn_level_bricks() -> void:
 	else:
 		push_speed = BalanceData.BRICK_PUSH_SPEED_INITIAL
 	
-	# 固定 5 秒一波
-	row_spawn_interval = 5.0
+	# 根据关卡配置调整行间隔（row_spawn_multiplier 越大间隔越长）
+	var spawn_mult := 1.0
+	if current_level_data is LevelData:
+		spawn_mult = (current_level_data as LevelData).row_spawn_multiplier
+	row_spawn_interval = BalanceData.BRICK_ROW_SPAWN_INTERVAL * spawn_mult
 	
 	# 重置计时器
 	push_timer = 0.0
@@ -282,6 +285,10 @@ func _spawn_new_row() -> void:
 	
 	# 当前关卡的行已全部生成完毕，自动切换到下一关
 	if current_row_index >= rows.size():
+		# 测试关循环：不推进，重新从第一行开始
+		if current_level_data is LevelData and (current_level_data as LevelData).id == 99:
+			current_row_index = 0
+			return
 		current_level_index += 1
 		if current_level_index >= level_data_list.size():
 			GameManager.end_game(true)
@@ -298,25 +305,117 @@ func _spawn_new_row() -> void:
 		_try_spawn_boss()
 	
 	var row_config: Dictionary = rows[current_row_index]
-	var brick_type: String = row_config.get("type", "normal")
-	var col_count: int = row_config.get("count", 15)
-	var scene_path: String = BRICK_SCENES.get(brick_type, BRICK_SCENES["normal"])
-	var brick_scene := load(scene_path)
-	
 	var brick_w := 64.0
-	var start_x := (BalanceData.WORLD_WIDTH - col_count * brick_w) * 0.5 + brick_w * 0.5
 	var start_y := 40.0
 	
-	for col in range(col_count):
-		var brick: Node2D = brick_scene.instantiate()
-		brick.position = Vector2(start_x + col * brick_w, start_y)
-		# 应用 HP 覆盖（如果有）
-		if row_config.has("hp_override"):
-			brick.hp = row_config["hp_override"]
-			brick.max_hp = row_config["hp_override"]
-		brick_container.add_child(brick)
+	# 检查是否使用新的混合格式（"types" 数组）
+	if row_config.has("types"):
+		_spawn_mixed_row(row_config["types"], brick_w, start_y, row_config)
+	else:
+		# 旧格式：单类型行
+		var brick_type: String = row_config.get("type", "normal")
+		var col_count: int = row_config.get("count", 15)
+		var slots: int = row_config.get("slots", col_count)  # slots 为空位总数
+		var scene_path: String = BRICK_SCENES.get(brick_type, BRICK_SCENES["normal"])
+		var brick_scene := load(scene_path)
+		
+		if slots > col_count:
+			# 有空隙：生成槽位布局，随机分配砖块和空隙
+			var layout := _generate_layout(slots, col_count)
+			var start_x := (BalanceData.WORLD_WIDTH - slots * brick_w) * 0.5 + brick_w * 0.5
+			for idx in range(slots):
+				if layout[idx]:  # true = 放砖块
+					var brick: Node2D = brick_scene.instantiate()
+					brick.position = Vector2(start_x + idx * brick_w, start_y)
+					if row_config.has("hp_override"):
+						brick.hp = row_config["hp_override"]
+						brick.max_hp = row_config["hp_override"]
+					brick_container.add_child(brick)
+		else:
+			# 无空隙：紧密排列
+			var start_x := (BalanceData.WORLD_WIDTH - col_count * brick_w) * 0.5 + brick_w * 0.5
+			for col in range(col_count):
+				var brick: Node2D = brick_scene.instantiate()
+				brick.position = Vector2(start_x + col * brick_w, start_y)
+				if row_config.has("hp_override"):
+					brick.hp = row_config["hp_override"]
+					brick.max_hp = row_config["hp_override"]
+				brick_container.add_child(brick)
 	
 	current_row_index += 1
+
+## 生成混合类型砖块行（一行多种砖块）
+func _spawn_mixed_row(types_config: Array, brick_w: float, start_y: float, row_config: Dictionary) -> void:
+	# 计算总砖块数
+	var total_count: int = 0
+	for type_cfg in types_config:
+		total_count += type_cfg.get("count", 0)
+	
+	if total_count <= 0:
+		return
+	
+	var slots: int = row_config.get("slots", total_count)  # slots 为空位总数
+	var use_gaps: bool = slots > total_count
+	
+	# 构建砖块类型列表（展开所有砖块）
+	var brick_list: Array[String] = []
+	for type_cfg in types_config:
+		var brick_type: String = type_cfg.get("type", "normal")
+		var count: int = type_cfg.get("count", 0)
+		for i in range(count):
+			brick_list.append(brick_type)
+	
+	if use_gaps:
+		# 有空隙：随机打乱砖块顺序，在 slots 个位置中分配
+		brick_list.shuffle()
+		var layout := _generate_layout(slots, total_count)
+		var start_x := (BalanceData.WORLD_WIDTH - slots * brick_w) * 0.5 + brick_w * 0.5
+		var brick_idx: int = 0
+		for idx in range(slots):
+			if layout[idx]:  # true = 放砖块
+				var brick_type: String = brick_list[brick_idx]
+				var scene_path: String = BRICK_SCENES.get(brick_type, BRICK_SCENES["normal"])
+				var brick: Node2D = load(scene_path).instantiate()
+				brick.position = Vector2(start_x + idx * brick_w, start_y)
+				if row_config.has("hp_override"):
+					brick.hp = row_config["hp_override"]
+					brick.max_hp = row_config["hp_override"]
+				brick_container.add_child(brick)
+				brick_idx += 1
+	else:
+		# 无空隙：紧密排列
+		var start_x := (BalanceData.WORLD_WIDTH - total_count * brick_w) * 0.5 + brick_w * 0.5
+		var current_col: int = 0
+		for type_cfg in types_config:
+			var brick_type: String = type_cfg.get("type", "normal")
+			var count: int = type_cfg.get("count", 0)
+			var scene_path: String = BRICK_SCENES.get(brick_type, BRICK_SCENES["normal"])
+			var brick_scene := load(scene_path)
+			for i in range(count):
+				var brick: Node2D = brick_scene.instantiate()
+				brick.position = Vector2(start_x + current_col * brick_w, start_y)
+				if row_config.has("hp_override"):
+					brick.hp = row_config["hp_override"]
+					brick.max_hp = row_config["hp_override"]
+				brick_container.add_child(brick)
+				current_col += 1
+
+## 生成槽位布局：在 total_slots 个位置中随机分配 brick_count 个砖块
+## 返回 bool 数组，true = 放砖块，false = 空隙
+func _generate_layout(total_slots: int, brick_count: int) -> Array[bool]:
+	var layout: Array[bool] = []
+	layout.resize(total_slots)
+	# 先全部填空
+	for i in range(total_slots):
+		layout[i] = false
+	# 随机选 brick_count 个位置放砖块
+	var positions: Array[int] = []
+	for i in range(total_slots):
+		positions.append(i)
+	positions.shuffle()
+	for i in range(mini(brick_count, total_slots)):
+		layout[positions[i]] = true
+	return layout
 
 ## 下压速度递增（每 30 秒增加）
 func _update_push_speed_increment(delta: float) -> void:

@@ -11,10 +11,6 @@ var move_speed: float = BalanceData.PADDLE_BASE_MOVE_SPEED
 ## 挡板高度（像素）
 var paddle_height: float = 16.0
 
-## 诅咒状态
-var is_cursed: bool = false
-var curse_timer: float = 0.0
-
 ## 子节点引用
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -28,22 +24,12 @@ func _physics_process(delta: float) -> void:
 	if GameManager.current_state not in [GameManager.GameState.PREPARING, GameManager.GameState.PLAYING]:
 		return
 	
-	# 诅咒计时
-	if is_cursed:
-		curse_timer -= delta
-		if curse_timer <= 0:
-			is_cursed = false
-	
 	# 处理输入
 	var input_dir := 0.0
 	if Input.is_action_pressed("move_left"):
 		input_dir -= 1.0
 	if Input.is_action_pressed("move_right"):
 		input_dir += 1.0
-	
-	# 诅咒期间操控反转
-	if is_cursed:
-		input_dir = -input_dir
 	
 	# 移动挡板
 	velocity = Vector2(input_dir * move_speed, 0)
@@ -76,8 +62,3 @@ func _on_build_applied(build_data: Resource) -> void:
 		if eff.has("widthAdd"):
 			paddle_width += eff["widthAdd"]
 			_update_collision_shape()
-
-## 施加操控反转诅咒
-func apply_curse(duration: float) -> void:
-	is_cursed = true
-	curse_timer = duration

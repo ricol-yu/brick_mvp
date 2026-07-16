@@ -2,7 +2,7 @@
 extends BrickBase
 
 ## 加速倍率
-const HASTE_MULTIPLIER: float = 1.5
+const HASTE_MULTIPLIER: float = 3.0
 ## 加速持续时间（秒）
 const HASTE_DURATION: float = 3.0
 

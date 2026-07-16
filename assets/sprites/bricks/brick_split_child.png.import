@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1308udp4nli2"
-valid=false
+uid="uid://buwqnxk783cyr"
+path="res://.godot/imported/brick_split_child.png-ba4a377627077538fed35b08a28dd0fc.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/sprites/bricks/brick_split_child.png"
+dest_files=["res://.godot/imported/brick_split_child.png-ba4a377627077538fed35b08a28dd0fc.ctex"]
 
 [params]
 

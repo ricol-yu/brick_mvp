@@ -7,9 +7,9 @@ script = ExtResource("1_script")
 id = 1
 level_name = "第一关 - 入门"
 rows = [
-{"type": "normal", "count": 15},
-{"type": "normal", "count": 15},
-{"type": "normal", "count": 15}
+{"type": "normal", "count": 12, "slots": 15},
+{"types": [{"type": "normal", "count": 9}, {"type": "regen", "count": 3}], "slots": 15},
+{"type": "normal", "count": 12, "slots": 15}
 ]
 has_boss = false
 boss_id = ""
