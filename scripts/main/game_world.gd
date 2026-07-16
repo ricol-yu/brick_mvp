@@ -14,6 +14,12 @@ const BONUS_BRICK_SCENE := preload("res://scenes/entities/bricks/bonus_brick.tsc
 const BRICK_SCENES: Dictionary = {
 	"normal": "res://scenes/entities/bricks/brick_normal.tscn",
 	"hard": "res://scenes/entities/bricks/brick_hard.tscn",
+	"split": "res://scenes/entities/bricks/brick_split.tscn",
+	"regen": "res://scenes/entities/bricks/brick_regen.tscn",
+	"ghost": "res://scenes/entities/bricks/brick_ghost.tscn",
+	"shield": "res://scenes/entities/bricks/brick_shield.tscn",
+	"haste": "res://scenes/entities/bricks/brick_haste.tscn",
+	"curse": "res://scenes/entities/bricks/brick_curse.tscn",
 }
 
 ## 子节点引用
@@ -56,6 +62,10 @@ var bonus_brick_interval: float = 0.0
 var push_speed_slow_timer: float = 0.0
 var push_speed_slow_duration: float = 5.0  ## 减速持续 5 秒
 var push_speed_reduction: float = 0.0
+
+## 加速砖 Boost 效果
+var push_speed_boost_multiplier: float = 1.0
+var push_speed_boost_timer: float = 0.0
 
 ## 底线 Y 坐标
 const BOTTOM_LINE_Y_POS: float = 650.0
@@ -130,6 +140,7 @@ func _process(delta: float) -> void:
 
 ## 关卡数据显式路径列表（避免 DirAccess 在 Web 导出时的兼容性问题）
 const LEVEL_PATHS: Array[String] = [
+	"res://data/levels/level_test.tres",
 	"res://data/levels/level_01.tres",
 	"res://data/levels/level_02.tres",
 	"res://data/levels/level_03.tres",
@@ -231,9 +242,21 @@ func _apply_safety_build_slow() -> void:
 				push_speed_reduction = dc.push_speed_reduction
 				push_speed_slow_timer = push_speed_slow_duration
 
+## 应用加速砖 Boost 效果（可叠加，取最大倍率）
+func apply_push_speed_boost(multiplier: float, duration: float) -> void:
+	if multiplier > push_speed_boost_multiplier:
+		push_speed_boost_multiplier = multiplier
+	push_speed_boost_timer = duration
+
 ## 砖块下压更新
 func _update_brick_push(delta: float) -> void:
-	var effective_speed := push_speed * (1.0 - push_speed_reduction)
+	# 加速 Boost 计时
+	if push_speed_boost_timer > 0:
+		push_speed_boost_timer -= delta
+		if push_speed_boost_timer <= 0:
+			push_speed_boost_multiplier = 1.0
+	
+	var effective_speed := push_speed * (1.0 - push_speed_reduction) * push_speed_boost_multiplier
 	for brick in brick_container.get_children():
 		if brick is Node2D:
 			brick.position.y += effective_speed * delta

@@ -54,7 +54,8 @@ func play_bgm(bgm_name: String) -> void:
 	
 	var stream: AudioStream = _bgm_cache.get(bgm_name)
 	if stream == null:
-		push_warning("BGM 未找到: " + bgm_name)
+		if show_missing_audio_warnings:
+			push_warning("BGM 未找到: " + bgm_name)
 		return
 	
 	_bgm_player.stream = stream
@@ -81,11 +82,15 @@ func play_boss_bgm() -> void:
 
 ## ===================== SFX API =====================
 
+## 是否显示音频未找到警告（调试时可关闭）
+var show_missing_audio_warnings: bool = true
+
 ## 播放 SFX（传入文件名，不含扩展名）
 func play_sfx(sfx_name: String, volume_offset_db: float = 0.0) -> void:
 	var stream: AudioStream = _sfx_cache.get(sfx_name)
 	if stream == null:
-		push_warning("SFX 未找到: " + sfx_name)
+		if show_missing_audio_warnings:
+			push_warning("SFX 未找到: " + sfx_name)
 		return
 	
 	# 从池中找一个空闲播放器

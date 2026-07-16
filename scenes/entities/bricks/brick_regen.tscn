@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/bricks/brick_regen.gd" id="1_regen"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bricks/brick_regen.png" id="2_regen_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_regen"]
+size = Vector2(64, 32)
+
+[node name="BrickRegen" type="StaticBody2D"]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("1_regen")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_regen_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_regen")
+
+[node name="HPLabel" type="Label" parent="."]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+horizontal_alignment = 1
+vertical_alignment = 1
