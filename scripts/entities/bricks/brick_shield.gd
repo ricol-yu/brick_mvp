@@ -38,3 +38,5 @@ func _on_shield_broken() -> void:
 		sprite.texture = hard_tex
 	# 必须重新调用 _update_visual 让 sprite 颜色反映新 HP
 	_update_visual()
+	# 生成护盾碎裂粒子特效
+	EffectSpawner.spawn_shield_break(global_position)

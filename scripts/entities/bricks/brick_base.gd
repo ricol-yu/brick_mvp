@@ -86,6 +86,8 @@ func take_damage(damage: float) -> void:
 ## 砖块被击碎
 func _on_destroyed() -> void:
 	AudioManager.play_sfx("brick_destroy")
+	# 生成碎裂粒子特效
+	EffectSpawner.spawn_brick_break(global_position, get_brick_type())
 	EventBus.brick_destroyed.emit(self, reward_exp)
 	# 生成经验掉落（通过 ExpSystem 处理）
 	queue_free()
@@ -95,6 +97,8 @@ func _start_flash() -> void:
 	flash_timer = FLASH_DURATION
 	if sprite:
 		sprite.modulate = Color(2.0, 2.0, 2.0, 1.0)  # 亮白色闪烁
+	# 受击缩放弹性
+	_start_hit_bounce()
 
 ## 停止闪烁
 func _stop_flash() -> void:
@@ -125,3 +129,11 @@ func start_burning(damage: float, duration: float) -> void:
 ## 获取砖块类型标识（子类覆盖）
 func get_brick_type() -> String:
 	return "normal"
+
+## 受击缩放弹性动画
+func _start_hit_bounce() -> void:
+	if not sprite:
+		return
+	var tween := create_tween()
+	tween.tween_property(sprite, "scale", Vector2(1.1, 1.1), 0.05)
+	tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.05)

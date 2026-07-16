@@ -29,12 +29,16 @@ var move_speed_multiplier: float = 1.0
 ## 子节点引用
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var trail_particles: CPUParticles2D = $TrailParticles
 
 func _ready() -> void:
 	add_to_group("ball")
 	_update_collision_shape()
 	EventBus.ball_launched.connect(_on_ball_launched)
 	EventBus.build_applied.connect(_on_build_applied)
+	# 初始化拖尾粒子为关闭状态
+	if trail_particles:
+		trail_particles.emitting = false
 
 func _physics_process(delta: float) -> void:
 	if not is_launched:
@@ -54,6 +58,9 @@ func _physics_process(delta: float) -> void:
 			# 恢复原始颜色
 			if sprite:
 				sprite.modulate = Color(1.0, 0.9, 0.3, 1.0)
+			# 恢复拖尾粒子颜色
+			if trail_particles:
+				trail_particles.color = Color(1.0, 0.9, 0.3, 0.6)
 	
 	# 移动球（move_speed_multiplier 仅影响移动速度，不影响伤害）
 	var move_distance := damage_calc.speed * move_speed_multiplier * delta
@@ -73,6 +80,9 @@ func _follow_paddle(_delta: float) -> void:
 func launch(launch_direction: Vector2 = Vector2(0, -1)) -> void:
 	is_launched = true
 	direction = launch_direction.normalized()
+	# 开启拖尾粒子
+	if trail_particles:
+		trail_particles.emitting = true
 
 ## 处理碰撞
 func _handle_collision(collision: KinematicCollision2D) -> void:
@@ -132,6 +142,8 @@ func _handle_collision(collision: KinematicCollision2D) -> void:
 	
 	# 反弹方向
 	direction = direction.bounce(normal)
+	# 碰撞闪光特效
+	EffectSpawner.spawn_hit_flash(global_position)
 	EventBus.ball_bounced.emit(collider_type, global_position)
 
 ## 处理挡板碰撞 - 返回反弹倍率
@@ -287,3 +299,6 @@ func apply_curse_slow(multiplier: float, duration: float) -> void:
 	# 视觉反馈：球变暗紫色
 	if sprite:
 		sprite.modulate = Color(0.5, 0.2, 0.8, 1.0)
+	# 拖尾粒子也变暗紫色
+	if trail_particles:
+		trail_particles.color = Color(0.5, 0.2, 0.8, 0.6)

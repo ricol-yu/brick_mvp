@@ -41,6 +41,8 @@ func _process(delta: float) -> void:
 			regen_flash_timer = REGEN_FLASH_DURATION
 			if sprite:
 				sprite.modulate = Color(0.3, 1.2, 0.3, 1.0)
+			# 生成再生回血粒子特效
+			EffectSpawner.spawn_regen(global_position)
 
 func get_brick_type() -> String:
 	return "regen"
