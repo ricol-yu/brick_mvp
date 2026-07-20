@@ -146,6 +146,7 @@ const LEVEL_PATHS: Array[String] = [
 	"res://data/levels/level_03.tres",
 	"res://data/levels/level_04.tres",
 	"res://data/levels/level_05.tres",
+	"res://data/levels/level_test.tres",
 ]
 
 ## 加载所有关卡数据文件
@@ -291,7 +292,8 @@ func _spawn_new_row() -> void:
 			return
 		current_level_index += 1
 		if current_level_index >= level_data_list.size():
-			GameManager.end_game(true)
+			# TODO: 测试阶段暂时注释通关逻辑
+			# GameManager.end_game(true)
 			return
 		current_level_data = level_data_list[current_level_index]
 		current_row_index = 0
@@ -303,6 +305,10 @@ func _spawn_new_row() -> void:
 		_notify_stage_changed()
 		# 尝试生成 Boss
 		_try_spawn_boss()
+		# 如果新关卡 rows 为空，递归尝试下一关
+		if rows.is_empty():
+			_spawn_new_row()
+			return
 	
 	var row_config: Dictionary = rows[current_row_index]
 	var brick_w := 64.0

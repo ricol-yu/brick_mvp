@@ -6,14 +6,7 @@
 script = ExtResource("1_script")
 id = 5
 level_name = "最终关 - 终极试炼"
-rows = [
-{"types": [{"type": "hard", "count": 4}, {"type": "split", "count": 4}, {"type": "hard", "count": 4}], "slots": 15},
-{"types": [{"type": "shield", "count": 4}, {"type": "regen", "count": 4}, {"type": "shield", "count": 4}], "slots": 15},
-{"types": [{"type": "ghost", "count": 4}, {"type": "haste", "count": 4}, {"type": "ghost", "count": 4}], "slots": 15},
-{"types": [{"type": "curse", "count": 4}, {"type": "hard", "count": 4}, {"type": "curse", "count": 4}], "slots": 15},
-{"types": [{"type": "split", "count": 3}, {"type": "regen", "count": 3}, {"type": "ghost", "count": 3}, {"type": "shield", "count": 3}], "slots": 15},
-{"types": [{"type": "haste", "count": 4}, {"type": "hard", "count": 4}, {"type": "haste", "count": 4}], "slots": 15}
-]
+rows = []
 has_boss = true
 boss_id = "boss_final"
 push_speed_multiplier = 2.5

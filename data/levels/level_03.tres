@@ -6,13 +6,7 @@
 script = ExtResource("1_script")
 id = 3
 level_name = "第三关 - 密集阵型"
-rows = [
-{"types": [{"type": "normal", "count": 6}, {"type": "split", "count": 3}, {"type": "normal", "count": 3}], "slots": 15},
-{"types": [{"type": "hard", "count": 5}, {"type": "ghost", "count": 5}, {"type": "hard", "count": 2}], "slots": 15},
-{"types": [{"type": "normal", "count": 4}, {"type": "haste", "count": 4}, {"type": "normal", "count": 4}], "slots": 15},
-{"types": [{"type": "shield", "count": 4}, {"type": "curse", "count": 4}, {"type": "shield", "count": 4}], "slots": 15},
-{"type": "hard", "count": 12, "slots": 15}
-]
+rows = []
 has_boss = false
 boss_id = ""
 push_speed_multiplier = 1.5

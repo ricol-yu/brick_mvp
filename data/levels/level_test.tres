@@ -7,7 +7,9 @@ script = ExtResource("1_script")
 id = 99
 level_name = "测试关 - 新砖块"
 rows = [
-{"type": "curse", "count": 8}
+{"type": "split", "count": 12, "slots": 15},
+{"type": "split", "count": 12, "slots": 15},
+{"type": "split", "count": 12, "slots": 15}
 ]
 has_boss = false
 boss_id = ""
