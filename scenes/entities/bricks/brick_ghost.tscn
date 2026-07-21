@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cyelyn4tnefca" path="res://assets/sprites/bricks/brick_ghost.png" id="2_ghost_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ghost"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickGhost" type="StaticBody2D" unique_id=1730156032]
 collision_layer = 8

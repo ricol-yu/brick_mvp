@@ -10,6 +10,8 @@ const BGM_GAME: AudioStream = preload("res://assets/audio/bgm/game_bgm.mp3")
 const SFX_BRICK_DESTROY: AudioStream = preload("res://assets/audio/sfx/brick_destroy.wav")
 const SFX_BUTTON_CLICK: AudioStream = preload("res://assets/audio/sfx/button_click.wav")
 const SFX_LEVEL_UP: AudioStream = preload("res://assets/audio/sfx/level_up.wav")
+## 砖块受击音效（文件未就位时安全跳过）
+var SFX_BRICK_HIT: AudioStream = null
 
 ## 音频缓存 { "name": AudioStream }
 var _bgm_cache: Dictionary = {}
@@ -134,6 +136,10 @@ func _init_audio_cache() -> void:
 	_sfx_cache["brick_destroy"] = SFX_BRICK_DESTROY
 	_sfx_cache["button_click"] = SFX_BUTTON_CLICK
 	_sfx_cache["level_up"] = SFX_LEVEL_UP
+	if SFX_BRICK_HIT == null and ResourceLoader.exists("res://assets/audio/sfx/brick_hit.wav"):
+		SFX_BRICK_HIT = load("res://assets/audio/sfx/brick_hit.wav")
+	if SFX_BRICK_HIT:
+		_sfx_cache["brick_hit"] = SFX_BRICK_HIT
 
 ## 获取已加载的 BGM 列表（调试用）
 func get_loaded_bgm() -> Array[String]:

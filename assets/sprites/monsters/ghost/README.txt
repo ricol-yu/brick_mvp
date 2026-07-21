@@ -5,13 +5,13 @@
 碰撞体积: 64x32
 
 文件清单:
-  idle.png   - 待机动画 spritesheet (4帧, 总尺寸 256x32)
-  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 128x32)
-  death.png  - 死亡动画 spritesheet (5帧, 总尺寸 320x32)
+  idle.png   - 待机动画 spritesheet (4帧, 总尺寸 262x32)
+  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 130x32)
+  death.png  - 死亡动画 spritesheet (5帧, 总尺寸 328x32)
 
 Spritesheet 规范:
   - 格式: PNG, 32-bit RGBA, 透明背景
-  - 排列: 帧水平排列, 帧间距 0px
+  - 排列: 帧水平排列, 帧间距 2px（相邻帧之间留2像素空白，防止边缘粘连）
   - 同张内帧尺寸严格一致
   - 无抗锯齿, 无 ICC 色彩配置
 
@@ -21,9 +21,9 @@ Spritesheet 规范:
   death: 5帧, FPS=8,  播完queue_free
 
 动画描述:
-  idle:  整体透明度缓慢波动（帧间 alpha: 1.0 -> 0.6 -> 1.0）
-  hit:   灵体闪烁更剧烈
-  death: 幽灵向上飘散，逐渐透明
+  idle:  蓝白色半透明兜帽幽灵，兜帽下是两点发光眼睛，底部是飘带状尾巴。整体上下飘浮，兜帽微微摆动，底部飘带波浪起伏
+  hit:   灵体剧烈抖动，透明度骤降
+  death: 兜帽掀起，灵体从底部开始向上飘散消散
 
 注意:
   - 实体态 idle 帧间透明度变化：帧1 alpha=1.0, 帧2=0.8, 帧3=0.6, 帧4=0.8

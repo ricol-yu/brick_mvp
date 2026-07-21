@@ -5,13 +5,13 @@
 碰撞体积: 64x32
 
 文件清单:
-  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 192x32)
-  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 128x32)
-  death.png  - 死亡动画 spritesheet (4帧, 总尺寸 256x32)
+  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 196x32)
+  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 130x32)
+  death.png  - 死亡动画 spritesheet (4帧, 总尺寸 262x32)
 
 Spritesheet 规范:
   - 格式: PNG, 32-bit RGBA, 透明背景
-  - 排列: 帧水平排列, 帧间距 0px
+  - 排列: 帧水平排列, 帧间距 2px（相邻帧之间留2像素空白，防止边缘粘连）
   - 同张内帧尺寸严格一致
   - 无抗锯齿, 无 ICC 色彩配置
 
@@ -21,9 +21,9 @@ Spritesheet 规范:
   death: 4帧, FPS=10, 播完queue_free
 
 动画描述:
-  idle:  绿色光晕从中心向外扩散
-  hit:   回缩 + 绿光闪烁
-  death: 绿色融化，向下滴落消散
+  idle:  翠绿色植物精灵，头顶开着小花苞，双手捧着发光草药球，脚下有草叶。花苞开合，草药球光晕向外扩散，草叶轻微摇摆
+  hit:   花苞闭合，草药球光芒闪烁，身体微缩
+  death: 花苞凋零，草药球碎裂，身体化为绿色光点消散
 
 注意:
   - 回血时代码会修改 modulate，素材颜色保持明亮绿色基调

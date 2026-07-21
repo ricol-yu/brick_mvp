@@ -5,13 +5,13 @@
 碰撞体积: 64x32
 
 文件清单:
-  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 192x32)
-  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 128x32)
-  death.png  - 死亡动画 spritesheet (5帧, 总尺寸 320x32)
+  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 196x32)
+  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 130x32)
+  death.png  - 死亡动画 spritesheet (5帧, 总尺寸 328x32)
 
 Spritesheet 规范:
   - 格式: PNG, 32-bit RGBA, 透明背景
-  - 排列: 帧水平排列, 帧间距 0px
+  - 排列: 帧水平排列, 帧间距 2px（相邻帧之间留2像素空白，防止边缘粘连）
   - 同张内帧尺寸严格一致
   - 无抗锯齿, 无 ICC 色彩配置
 
@@ -21,9 +21,9 @@ Spritesheet 规范:
   death: 5帧, FPS=8,  播完queue_free
 
 动画描述:
-  idle:  暗紫色能量缓慢脉动
-  hit:   诅咒符文闪烁
-  death: 诅咒爆炸，紫色烟雾残留
+  idle:  暗紫色悬浮符文石，表面刻有发光咒文，周围环绕旋转的咒文符号。符文石缓慢自转，周围咒文符号旋转，暗紫色能量脉动
+  hit:   咒文闪烁增强，符文石震颤
+  death: 符文石碎裂，咒文符号爆炸飞散，紫色烟雾残留
 
 注意:
   - death 动画最后几帧应暗示"释放诅咒"（代码在 death 动画结束后触发诅咒效果）

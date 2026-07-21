@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/bricks/brick_haste.png" id="2_haste_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_haste"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickHaste" type="StaticBody2D"]
 collision_layer = 8

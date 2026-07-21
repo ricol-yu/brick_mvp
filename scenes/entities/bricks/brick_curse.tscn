@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b6pfinjndwl6s" path="res://assets/sprites/bricks/brick_curse.png" id="2_curse_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_curse"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickCurse" type="StaticBody2D" unique_id=2051343751]
 collision_layer = 8

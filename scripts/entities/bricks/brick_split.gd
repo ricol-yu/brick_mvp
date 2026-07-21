@@ -9,14 +9,14 @@ const IDLE_TEX := preload("res://assets/sprites/monsters/split/idle.png")
 const HIT_TEX := preload("res://assets/sprites/monsters/split/hit.png")
 const DEATH_TEX := preload("res://assets/sprites/monsters/split/death.png")
 
-## 帧尺寸（根据实际 spritesheet 计算）
-const IDLE_FRAME_W := 33
+## 帧尺寸（根据实际 spritesheet 计算，1.5x 缩放后）
+const IDLE_FRAME_W := 50
 const IDLE_FRAME_COUNT := 4
-const HIT_FRAME_W := 33
+const HIT_FRAME_W := 50
 const HIT_FRAME_COUNT := 3
-const DEATH_FRAME_W := 37
+const DEATH_FRAME_W := 56
 const DEATH_FRAME_COUNT := 5
-const FRAME_H := 32
+const FRAME_H := 48
 
 func _ready() -> void:
 	hp = 3.0  # 测试用：至少 3 次 hit 才死亡

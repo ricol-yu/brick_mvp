@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dgkvv1bgwbf7l" path="res://scripts/entities/bricks/brick_split.gd" id="1_split"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_split"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickSplit" type="StaticBody2D" unique_id=1434868681]
 collision_layer = 8

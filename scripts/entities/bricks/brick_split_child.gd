@@ -7,23 +7,23 @@ const HIT_TEX := preload("res://assets/sprites/monsters/split/hit.png")
 const DEATH_TEX := preload("res://assets/sprites/monsters/split/death.png")
 
 ## 帧尺寸（与分裂砖一致，通过 scale=0.5 缩小）
-const IDLE_FRAME_W := 33
+const IDLE_FRAME_W := 50
 const IDLE_FRAME_COUNT := 4
-const HIT_FRAME_W := 33
+const HIT_FRAME_W := 50
 const HIT_FRAME_COUNT := 3
-const DEATH_FRAME_W := 37
+const DEATH_FRAME_W := 56
 const DEATH_FRAME_COUNT := 5
-const FRAME_H := 32
+const FRAME_H := 48
 
 func _ready() -> void:
-	brick_width = 32.0
-	brick_height = 32.0
+	brick_width = 48.0
+	brick_height = 24.0
 	hp = 1.0
 	max_hp = 1.0
 	super._ready()
 	# 调整碰撞形状为半尺寸
 	if collision_shape and collision_shape.shape is RectangleShape2D:
-		(collision_shape.shape as RectangleShape2D).size = Vector2(32, 32)
+		(collision_shape.shape as RectangleShape2D).size = Vector2(48, 24)
 	# 配置动画（复用分裂砖素材，scale 0.5 已设置在 tscn 中）
 	_setup_animations()
 

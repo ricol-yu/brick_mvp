@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/bricks/brick_regen.png" id="2_regen_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_regen"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickRegen" type="StaticBody2D"]
 collision_layer = 8

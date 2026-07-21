@@ -65,12 +65,16 @@ const BONUS_BRICK_SPAWN_INTERVAL_MAX: float = 40.0
 const BRICK_PUSH_SPEED_INITIAL: float = 5.0    ## 初始下推速度（像素/秒）
 const BRICK_PUSH_SPEED_INCREMENT: float = 1.0  ## 每 30 秒增加的速度
 const BRICK_ROW_SPAWN_INTERVAL: float = 15.0   ## 每隔多少秒生成新行
-const BOTTOM_LINE_Y: float = 650.0              ## 底线 Y 坐标（像素）
+const BOTTOM_LINE_Y: float = 975.0              ## 底线 Y 坐标（像素）
 
 # ===================== 游戏世界尺寸 =====================
-const WORLD_WIDTH: float = 1280.0
-const WORLD_HEIGHT: float = 720.0
+const BASE_WIDTH: float = 1920.0          ## 基准分辨率宽（修改分辨率只需改这里）
+const BASE_HEIGHT: float = 1080.0         ## 基准分辨率高（修改分辨率只需改这里）
+const WORLD_WIDTH: float = BASE_WIDTH
+const WORLD_HEIGHT: float = BASE_HEIGHT
 const WALL_THICKNESS: float = 20.0
+const BRICK_WIDTH: float = 96.0           ## 砖块宽度（等比缩放：原64 @1280 → 96 @1920）
+const BRICK_HEIGHT: float = 48.0          ## 砖块高度（等比缩放：原32 @720 → 48 @1080）
 
 # ===================== 伤害计算辅助 =====================
 ## 计算最终伤害

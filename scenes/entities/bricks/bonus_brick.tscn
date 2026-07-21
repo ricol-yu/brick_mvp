@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/bricks/brick_bonus.png" id="2_bb_tex"]
 
 [sub_resource type="RectangleShape2D" id="brick_shape"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BonusBrick" type="StaticBody2D"]
 collision_layer = 64

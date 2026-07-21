@@ -67,8 +67,8 @@ var push_speed_reduction: float = 0.0
 var push_speed_boost_multiplier: float = 1.0
 var push_speed_boost_timer: float = 0.0
 
-## 底线 Y 坐标
-const BOTTOM_LINE_Y_POS: float = 650.0
+## 底线 Y 坐标（引用 BalanceData 集中配置）
+var BOTTOM_LINE_Y_POS: float = BalanceData.BOTTOM_LINE_Y
 
 func _ready() -> void:
 	add_to_group("game_world")
@@ -311,7 +311,7 @@ func _spawn_new_row() -> void:
 			return
 	
 	var row_config: Dictionary = rows[current_row_index]
-	var brick_w := 64.0
+	var brick_w := BalanceData.BRICK_WIDTH
 	var start_y := 40.0
 	
 	# 检查是否使用新的混合格式（"types" 数组）

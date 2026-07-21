@@ -10,15 +10,21 @@ class_name BrickBase
 @export var reward_exp: int = BalanceData.BRICK_BASE_EXP
 @export var reward_coin: int = BalanceData.BRICK_BASE_COIN
 
-## 砖块尺寸
-@export var brick_width: float = 64.0
-@export var brick_height: float = 32.0
+## 砖块尺寸（引用 BalanceData 集中配置）
+@export var brick_width: float = BalanceData.BRICK_WIDTH
+@export var brick_height: float = BalanceData.BRICK_HEIGHT
 
 ## 受击闪烁时间
 const FLASH_DURATION := 0.1
 
+## 受击音效冷却（秒）——同一砖块在此时间内不重复播放受击音
+const HIT_SFX_COOLDOWN := 0.15
+
 ## 闪烁计时器
 var flash_timer: float = 0.0
+
+## 受击音效冷却计时
+var _hit_sfx_cooldown: float = 0.0
 
 ## 原始颜色（场景设置的 modulate）
 var _base_color: Color = Color.WHITE
@@ -60,6 +66,10 @@ func _process(delta: float) -> void:
 		if flash_timer <= 0:
 			_stop_flash()
 	
+	# 受击音效冷却
+	if _hit_sfx_cooldown > 0:
+		_hit_sfx_cooldown -= delta
+	
 	# 火焰 DoT
 	if is_burning:
 		burn_timer += delta
@@ -87,6 +97,11 @@ func take_damage(damage: float) -> void:
 	# 受击闪烁
 	_start_flash()
 	_update_visual()
+	
+	# 播放受击音效（带冷却，避免过于密集）
+	if _hit_sfx_cooldown <= 0:
+		AudioManager.play_sfx("brick_hit")
+		_hit_sfx_cooldown = HIT_SFX_COOLDOWN
 	
 	EventBus.brick_hit.emit(self, damage)
 	

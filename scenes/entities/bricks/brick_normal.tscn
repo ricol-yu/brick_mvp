@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dg5o2wyurf1oo" path="res://assets/sprites/bricks/brick_normal.png" id="2_njsdd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_brick"]
-size = Vector2(64, 32)
+size = Vector2(96, 48)
 
 [node name="BrickNormal" type="StaticBody2D" unique_id=774147579]
 collision_layer = 8

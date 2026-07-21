@@ -1,17 +1,17 @@
 怪物精灵素材规范
 ================
 类型: haste（加速怪）
-单帧尺寸: 64x32 像素
-碰撞体积: 64x32
+单帧尺寸: 96x48 像素
+碰撞体积: 96x48
 
 文件清单:
-  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 192x32)
-  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 128x32)
-  death.png  - 死亡动画 spritesheet (4帧, 总尺寸 256x32)
+  idle.png   - 待机动画 spritesheet (3帧, 总尺寸 292x48)
+  hit.png    - 受击动画 spritesheet (2帧, 总尺寸 194x48)
+  death.png  - 死亡动画 spritesheet (4帧, 总尺寸 390x48)
 
 Spritesheet 规范:
   - 格式: PNG, 32-bit RGBA, 透明背景
-  - 排列: 帧水平排列, 帧间距 0px
+  - 排列: 帧水平排列, 帧间距 2px（相邻帧之间留2像素空白，防止边缘粘连）
   - 同张内帧尺寸严格一致
   - 无抗锯齿, 无 ICC 色彩配置
 
@@ -21,6 +21,6 @@ Spritesheet 规范:
   death: 4帧, FPS=12, 播完queue_free
 
 动画描述:
-  idle:  速度线从尾部快速闪过
-  hit:   加速残影
-  death: 爆裂 + 速度波纹向外扩散
+  idle:  金黄色敏捷小斥候，背后飘带/围巾向后飞扬，脚底有气流旋涡特效。飘带快速抖动，脚底气流旋转，身体前倾呈冲刺姿态
+  hit:   飘带剧烈甩动，身后留下残影
+  death: 身体爆裂，速度波纹向外扩散，飘带最后消散
